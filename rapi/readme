@@ -1,0 +1,38 @@
+async function getMatches(req, res) {
+  let matches = await MatchModel.find();
+  res.send(matches);
+}
+
+
+async function addMatch(req, res) {
+  let data = req.body;
+
+  if (data.teamB === data.teamA) {
+    return res.status(400).send({
+      message: "match should be between different teams"
+    });
+  }
+
+  let wallet = await MatchModel.create({
+    date: new Date(new Date(data.date).getDate()),
+    city: data.city,
+    teamA: data.teamA,
+    teamB: data.teamB,
+  });
+
+  res.status(201).send(wallet);
+
+}
+
+const schema = new Schema({
+  city: {type: String, required: true},
+  date: {type: Date, required: true},
+  teamA: {type: String, required: true},
+  teamB: {type: String, required: true},
+});
+
+mongoose.connect(config.get("db")
+,
+{ useNewUrlParser: true  ,useUnifiedTopology: true}  )
+.then(() => console.log("Connected to Mongo...."))
+.catch((error) => console.log(error.message));
