@@ -1,12 +1,20 @@
 const express= require("express");
+const validateMatch = require("../../middlewares/validatematch");
+const auth = require("../../middlewares/auth");
+
 let router = express.Router();
-var Match= require("../../models/match")
+var {Match,validate}= require("../../models/match")
 // router.get("/",async (req,res)=>{
 //     return res.send(["pani ","khana"]);
 // });
 
-router.get("/",async (req,res)=>{
-    let matches = await Match.find();
+router.get("/",auth,async (req,res)=>{
+    
+    let page =Number(req.query.page? req.query.page: 1);
+    let perPage=Number(req.query.perPage? req.query.perPage: 10);
+    let skipRecords =perPage*(page-1);
+
+    let matches = await Match.find().skip(skipRecords).limit(perPage);
      
       return res.send(matches);
 });
@@ -32,7 +40,8 @@ catch(err){
 }
     
 });
-router.put("/:id", async(req,res)=>{
+
+router.put("/:id",validateMatch, async(req,res)=>{
     let match =await Match.findById(req.params.id);
     match.city=req.body.city;
     match.date=req.body.date;
@@ -50,14 +59,16 @@ router.delete("/:id", async(req,res)=>{
     
     return res.send(match);
 })
-router.post("/", async(req,res)=>{
+router.post("/",validateMatch, async(req,res)=>{
     let match = new Match( );
+
     match.city=req.body.city;
     match.date=req.body.date;
     match.teamA=req.body.teamA;
     match.teamB=req.body.teamB;
     await match.save();
      return res.send(match);
-})
+});
+
 
 module.exports = router;

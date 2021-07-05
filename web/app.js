@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var mongoose=require("mongoose");
 var config = require("config");
+var bcrypt = require("bcryptjs");
+const jwt=require("jsonwebtoken");
 
 
 var indexRouter = require('./routes/index');
